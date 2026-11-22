@@ -1,0 +1,10 @@
+{
+  "//": "Garante a regra de arquitetura: o core e a CLI compilam SEM a lib DOM e sem React.",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "jsx": "preserve",
+    "types": ["node"]
+  },
+  "include": ["src/core", "src/scenarios", "cli"]
+}
