@@ -9,5 +9,6 @@ export * from './allocators/allocator';
 export * from './allocators/contiguous';
 export * from './allocators/linked';
 export * from './allocators/indexed';
+export * from './allocators/factory';
 export * from './metrics';
 export * from './simulator';

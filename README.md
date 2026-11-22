@@ -30,12 +30,15 @@ npm run cli      # roda o cenário padrão no terminal e imprime o disco em text
 npm test         # roda os testes (Vitest)
 ```
 
-A CLI aceita a técnica e a estratégia como argumentos:
+A CLI imprime o disco antes/depois de cada operação (`[  ]` livre, `[A ]` dados,
+`[A→]` dados com ponteiro, `[iA]` bloco de índice), seguido das métricas. Aceita a
+técnica, a estratégia da contígua, a política de blocos livres e a semente:
 
 ```bash
 npm run cli -- contiguous best-fit
-npm run cli -- linked
+npm run cli -- linked --policy random --seed 7
 npm run cli -- indexed
+npm run cli -- --compare           # ao final, tabela comparativa das 3 técnicas
 ```
 
 Outros scripts: `npm run build`, `npm run lint`, `npm run format`.
