@@ -1,4 +1,6 @@
-/** Página ExecutionPage — a implementar (frente 3: interface). */
-export function ExecutionPage() {
-  return null;
+import type { SimSetup } from '../config';
+
+/** Página ExecutionPage — a implementar. */
+export function ExecutionPage({ setup }: { setup: SimSetup }) {
+  return <p className="muted">Em construção ({setup.operations.length} operações).</p>;
 }
