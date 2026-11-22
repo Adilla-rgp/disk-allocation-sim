@@ -1,6 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/figtree';
+import '@fontsource-variable/jetbrains-mono';
 import './ui/styles.css';
 
 createRoot(document.getElementById('root')!).render(

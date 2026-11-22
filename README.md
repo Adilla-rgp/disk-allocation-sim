@@ -98,6 +98,20 @@ caber numa tela de 1366×768 e tem três páginas:
   **Exportar CSV**, que gera um arquivo com `;` e vírgula decimal, pronto para o
   relatório.
 
+Em todas as páginas que mostram passos há um **narrador**: uma caixa que explica em
+português simples o que aconteceu e por quê. Ele está em `src/ui/narration.ts` e usa
+apenas os eventos e snapshots do core.
+
+### Identidade visual
+
+O nome na interface é **Blocos & Arquivos**. As fontes são Bricolage Grotesque nos
+títulos, Figtree no texto e JetBrains Mono nos números; elas vêm do `@fontsource` e são
+embutidas no build, então funcionam offline no laboratório. A paleta dos arquivos foi
+escolhida à mão (`src/ui/format.ts`), os ícones são SVGs próprios
+(`src/ui/components/Icon.tsx`) e as cores ficam em variáveis no topo de
+`src/ui/styles.css`. Para pôr os nomes da equipe no rodapé, preencha `team` em
+`src/ui/credits.ts`.
+
 A UI não reimplementa regras de alocação. O hook `useSimulation(config, ops)` chama
 `runScenario` do core e expõe o snapshot do passo atual e os controles do player.
 `useComparison` faz o mesmo com `runComparison`.

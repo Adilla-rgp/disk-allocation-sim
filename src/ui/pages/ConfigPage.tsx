@@ -1,6 +1,8 @@
 import type { FitStrategy, FreeBlockPolicy, Operation, TechniqueName } from '../../core';
 import { scenarios, type ScenarioPreset } from '../../scenarios';
 import { LIMITS, TECHNIQUE_LABELS, validateSetup, type SimConfig, type SimSetup } from '../config';
+import { Icon } from '../components/Icon';
+import { TechniqueSketch } from '../components/TechniqueSketch';
 import { fileColors } from '../format';
 
 interface ConfigPageProps {
@@ -13,6 +15,13 @@ interface ConfigPageProps {
 }
 
 const TECHNIQUES: TechniqueName[] = ['contiguous', 'linked', 'indexed'];
+
+/** Resumo de uma linha de cada técnica, nos cartões de escolha. */
+const TECHNIQUE_HINTS: Record<TechniqueName, string> = {
+  contiguous: 'blocos lado a lado',
+  linked: 'cada bloco aponta o próximo',
+  indexed: 'um índice lista os blocos',
+};
 const STRATEGIES: FitStrategy[] = ['first-fit', 'best-fit', 'worst-fit'];
 const POLICIES: { value: FreeBlockPolicy; label: string }[] = [
   { value: 'first-free', label: 'first-free (menor índice)' },
@@ -29,26 +38,33 @@ export function ConfigPage({ setup, onChange, onRun, onCompare }: ConfigPageProp
 
   return (
     <div>
-      <div className="config-page">
-        <ControlPanel config={setup.config} onChange={(config) => onChange({ ...setup, config })} />
-        <OperationsPanel setup={setup} onChange={onChange} />
+      <div className="config-head">
+        <p className="intro">
+          Monte um roteiro de <strong>criar</strong> e <strong>remover</strong> arquivos, escolha
+          como o disco vai guardá-los e veja, bloco a bloco, o que acontece. Comece por um dos
+          cenários prontos se preferir.
+        </p>
+        <div className="actions">
+          <button className="btn" disabled={!valid} onClick={onCompare}>
+            <Icon name="compare" /> Comparar as três
+          </button>
+          <button className="btn btn-primary" disabled={!valid} onClick={onRun}>
+            Ver passo a passo <Icon name="run" />
+          </button>
+        </div>
       </div>
 
       {!valid && (
-        <ul className="errors" style={{ marginTop: 14 }}>
+        <ul className="errors" style={{ marginBottom: 14 }}>
           {errors.map((e) => (
             <li key={e}>{e}</li>
           ))}
         </ul>
       )}
 
-      <div className="actions">
-        <button className="btn" disabled={!valid} onClick={onCompare}>
-          ⚖ Comparar técnicas
-        </button>
-        <button className="btn btn-primary" disabled={!valid} onClick={onRun}>
-          ▶ Executar
-        </button>
+      <div className="config-page">
+        <ControlPanel config={setup.config} onChange={(config) => onChange({ ...setup, config })} />
+        <OperationsPanel setup={setup} onChange={onChange} />
       </div>
     </div>
   );
@@ -96,21 +112,23 @@ function ControlPanel({
   return (
     <section className="card">
       <h2 className="card-title">
-        <span className="dot" /> Painel de Controle
+        Como guardar <small>painel de controle</small>
       </h2>
       <div className="control-grid">
         <div className="field full">
-          <span>Técnica (modo execução)</span>
-          <div className="segmented" role="radiogroup">
+          <span>Técnica do passo a passo</span>
+          <div className="technique-picker" role="radiogroup">
             {TECHNIQUES.map((t) => (
               <button
                 key={t}
                 role="radio"
                 aria-checked={config.technique === t}
-                className={config.technique === t ? 'active' : ''}
+                className={`technique-option ${config.technique === t ? 'active' : ''}`}
                 onClick={() => set('technique', t)}
               >
-                {TECHNIQUE_LABELS[t]}
+                <TechniqueSketch technique={t} />
+                <strong>{TECHNIQUE_LABELS[t]}</strong>
+                <small>{TECHNIQUE_HINTS[t]}</small>
               </button>
             ))}
           </div>
@@ -156,7 +174,7 @@ function ControlPanel({
           comparação, cada técnica usa o que lhe diz respeito.
         </p>
 
-        <div className="section-label">Disco</div>
+        <div className="section-label">O disco</div>
         <NumberField
           label="Nº de blocos"
           value={config.diskSize}
@@ -228,7 +246,7 @@ function OperationsPanel({
   return (
     <section className="card">
       <h2 className="card-title">
-        <span className="dot" /> Painel de Operações
+        O que acontece no disco <small>painel de operações</small>
       </h2>
 
       <div className="scenario-picker">
@@ -275,14 +293,15 @@ function OperationsPanel({
                   </select>
                 </td>
                 <td>
-                  <span className="op-swatch" style={{ background: colors.get(op.fileName) }} />
-                  <input
-                    className="input"
-                    style={{ width: 'calc(100% - 16px)' }}
-                    value={op.fileName}
-                    list={op.type === 'remove' ? 'created-files' : undefined}
-                    onChange={(e) => updateOp(i, { ...op, fileName: e.target.value })}
-                  />
+                  <div className="op-file">
+                    <span className="op-swatch" style={{ background: colors.get(op.fileName) }} />
+                    <input
+                      className="input"
+                      value={op.fileName}
+                      list={op.type === 'remove' ? 'created-files' : undefined}
+                      onChange={(e) => updateOp(i, { ...op, fileName: e.target.value })}
+                    />
+                  </div>
                 </td>
                 <td style={{ width: 170 }}>
                   {op.type === 'create' ? (
@@ -309,7 +328,7 @@ function OperationsPanel({
                     aria-label={`Remover operação ${i + 1}`}
                     onClick={() => setOps(operations.filter((_, j) => j !== i))}
                   >
-                    ✕
+                    <Icon name="close" size={16} />
                   </button>
                 </td>
               </tr>
@@ -330,7 +349,7 @@ function OperationsPanel({
             setOps([...operations, { type: 'create', fileName: nextName(), sizeInBytes: 1000 }])
           }
         >
-          + Criar arquivo
+          <Icon name="plus" size={16} /> Criar arquivo
         </button>
         <button
           className="btn"
@@ -339,7 +358,7 @@ function OperationsPanel({
             setOps([...operations, { type: 'remove', fileName: createdNames[0] ?? '' }])
           }
         >
-          + Remover arquivo
+          <Icon name="minus" size={16} /> Remover arquivo
         </button>
       </div>
     </section>

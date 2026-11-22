@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import type { SimulationResult } from '../../core';
 import { DiskGrid } from '../components/DiskGrid';
+import { Icon } from '../components/Icon';
+import { Narration } from '../components/Narration';
 import { MomentToggle, PlayerControls } from '../components/PlayerControls';
 import {
   comparisonCsv,
@@ -10,17 +12,12 @@ import {
   type MetricRow,
 } from '../comparisonTable';
 import type { SimSetup } from '../config';
-import {
-  describeOperation,
-  EVENT_LABELS,
-  fileColors,
-  fmtPercent,
-  type FileColors,
-} from '../format';
+import { describeOperation, fileColors, fmtPercent, type FileColors } from '../format';
 import { useComparison, type ComparisonRun } from '../hooks/useComparison';
 import type { Player } from '../hooks/usePlayer';
 import { metricsAt } from '../hooks/useSimulation';
 import { stepMarks } from '../marks';
+import { explainStep } from '../narration';
 
 /**
  * Comparação: o mesmo roteiro nas três técnicas, com três discos lado a lado controlados
@@ -118,12 +115,10 @@ function TechniqueColumn({
         animKey={`${step.step}-${player.moment}`}
         compact
       />
-      {event && (
-        <p className={`technique-event ${event.type}`}>
-          <span className={`chip chip-${event.type}`}>{EVENT_LABELS[event.type]}</span>{' '}
-          {event.message}
-        </p>
-      )}
+      <Narration
+        text={explainStep(step, allocator)}
+        failed={event?.type === 'fail' || event?.type === 'error'}
+      />
       <dl className="technique-summary">
         <div>
           <dt>Ocupação</dt>
@@ -160,10 +155,10 @@ function ComparisonTable({ results, fileName }: { results: SimulationResult[]; f
     <section className="card">
       <div className="table-head">
         <h2 className="card-title" style={{ margin: 0 }}>
-          <span className="dot" /> Resultado ao final do roteiro
+          Quem se saiu melhor <small>resultado ao final do roteiro</small>
         </h2>
         <button className="btn" onClick={() => downloadText(fileName, comparisonCsv(results))}>
-          ⤓ Exportar CSV
+          <Icon name="download" size={16} /> Exportar CSV
         </button>
       </div>
       <table className="data-table comparison-table">

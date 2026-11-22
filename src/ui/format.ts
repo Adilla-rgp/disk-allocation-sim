@@ -28,10 +28,24 @@ export const EVENT_LABELS: Record<SimulationEventType, string> = {
 export type FileColors = Map<string, string>;
 
 /**
- * Matizes bem separados entre si, para os arquivos não se confundirem no tema escuro.
- * Depois do 12º arquivo, as cores se repetem com outra luminosidade.
+ * Cores escolhidas à mão (tons pastel que leem bem sobre o fundo escuro e entre si),
+ * na ordem em que os arquivos aparecem: lavanda, céu, menta, damasco, rosa, água,
+ * limão, coral, pervinca, lima, areia e orquídea.
  */
-const HUES = [265, 205, 150, 30, 330, 180, 55, 290, 0, 120, 230, 90];
+const PALETTE = [
+  '#b8a3fb',
+  '#86cdf5',
+  '#8fe3b0',
+  '#f9b987',
+  '#f5a3c7',
+  '#6fd9c8',
+  '#f2dd7a',
+  '#f79b8f',
+  '#a3b5fb',
+  '#c6e67e',
+  '#e3c4a1',
+  '#e6a8f0',
+];
 
 /**
  * Atribui uma cor fixa a cada arquivo, na ordem em que aparece no roteiro. Assim, o mesmo
@@ -44,8 +58,10 @@ export function fileColors(operations: Operation[]): FileColors {
   for (const op of operations) {
     if (colors.has(op.fileName)) continue;
     const i = colors.size;
-    const light = i < HUES.length ? 62 : 48;
-    colors.set(op.fileName, `hsl(${HUES[i % HUES.length]} 70% ${light}%)`);
+    // Depois da 12ª cor, gera tons intermediários para não repetir.
+    const color =
+      i < PALETTE.length ? PALETTE[i] : `hsl(${(i * 47) % 360} 65% ${i % 2 ? 72 : 64}%)`;
+    colors.set(op.fileName, color);
   }
   return colors;
 }

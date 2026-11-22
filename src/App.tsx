@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { Logo } from './ui/components/Icon';
 import { initialSetup, validateSetup, type SimSetup } from './ui/config';
+import { CREDITS } from './ui/credits';
 import { ComparisonPage } from './ui/pages/ComparisonPage';
 import { ConfigPage } from './ui/pages/ConfigPage';
 import { ExecutionPage } from './ui/pages/ExecutionPage';
@@ -8,9 +10,9 @@ import { ExecutionPage } from './ui/pages/ExecutionPage';
 type Page = 'config' | 'execution' | 'comparison';
 
 const PAGES: { id: Page; label: string }[] = [
-  { id: 'config', label: 'Configuração' },
-  { id: 'execution', label: 'Execução' },
-  { id: 'comparison', label: 'Comparação' },
+  { id: 'config', label: '1 · Montar' },
+  { id: 'execution', label: '2 · Executar' },
+  { id: 'comparison', label: '3 · Comparar' },
 ];
 
 /**
@@ -27,12 +29,12 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <div className="brand-logo" aria-hidden>
-            ▦
-          </div>
+          <Logo />
           <div>
-            Simulador de Alocação de Arquivos
-            <small>Contígua · Encadeada · Indexada — Sistemas Operacionais I</small>
+            <h1>
+              Blocos <em>&amp;</em> Arquivos
+            </h1>
+            <small>Um simulador de alocação contígua, encadeada e indexada</small>
           </div>
         </div>
         <nav className="tabs">
@@ -59,6 +61,20 @@ export default function App() {
       )}
       {page === 'execution' && <ExecutionPage setup={setup} />}
       {page === 'comparison' && <ComparisonPage setup={setup} />}
+
+      <footer className="footer">
+        <span>
+          Trabalho final de {CREDITS.course} · {CREDITS.institution}
+          {CREDITS.team.length > 0 && <> · feito por {joinNames(CREDITS.team)}</>}
+        </span>
+        <span>Dica: use ← → e espaço para navegar pelos passos.</span>
+      </footer>
     </div>
   );
+}
+
+/** "Ana", "Ana e Bia", "Ana, Bia e Caio". */
+function joinNames(names: string[]): string {
+  if (names.length <= 1) return names.join('');
+  return `${names.slice(0, -1).join(', ')} e ${names[names.length - 1]}`;
 }

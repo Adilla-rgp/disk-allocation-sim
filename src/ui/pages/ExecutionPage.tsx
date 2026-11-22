@@ -3,11 +3,13 @@ import { DirectoryTable } from '../components/DirectoryTable';
 import { DiskGrid, DiskLegend } from '../components/DiskGrid';
 import { EventLog } from '../components/EventLog';
 import { MetricsCards } from '../components/MetricsCards';
+import { Narration } from '../components/Narration';
 import { MomentToggle, PlayerControls } from '../components/PlayerControls';
 import type { SimSetup } from '../config';
 import { describeOperation, fileColors } from '../format';
 import { useSimulation } from '../hooks/useSimulation';
 import { stepMarks } from '../marks';
+import { explainStep } from '../narration';
 
 /**
  * Modo execução: roda o roteiro com a técnica escolhida e permite navegar passo a passo.
@@ -47,7 +49,7 @@ export function ExecutionPage({ setup }: { setup: SimSetup }) {
       <div className="execution-main">
         <section className="card">
           <h2 className="card-title">
-            <span className="dot" /> Diretório
+            Diretório <small>o que o sistema anota</small>
           </h2>
           <DirectoryTable
             snapshot={snapshot}
@@ -61,7 +63,7 @@ export function ExecutionPage({ setup }: { setup: SimSetup }) {
         <section className="card disk-card">
           <div className="disk-header">
             <h2 className="card-title" style={{ margin: 0 }}>
-              <span className="dot" /> Disco
+              O disco <small>{allocator.label}</small>
             </h2>
             <MomentToggle player={player} />
           </div>
@@ -74,14 +76,12 @@ export function ExecutionPage({ setup }: { setup: SimSetup }) {
             marks={stepMarks(step, player.moment)}
             animKey={`${step.step}-${player.moment}`}
           />
-          {failed && player.moment === 'after' && <p className="step-alert">{failed.message}</p>}
+          <Narration text={explainStep(step, allocator)} failed={Boolean(failed)} />
           <DiskLegend technique={allocator.name} />
         </section>
 
         <section className="card log-card">
-          <h2 className="card-title">
-            <span className="dot" /> Eventos
-          </h2>
+          <h2 className="card-title">Linha do tempo</h2>
           <EventLog
             events={result.events}
             currentStep={step.step}

@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { SPEEDS, type Player } from '../hooks/usePlayer';
+import { Icon } from './Icon';
 
 interface PlayerControlsProps {
   player: Player;
@@ -39,7 +40,7 @@ export function PlayerControls({ player, caption }: PlayerControlsProps) {
           disabled={index === 0}
           onClick={player.first}
         >
-          ⏮
+          <Icon name="first" size={16} />
         </button>
         <button
           className="btn btn-icon"
@@ -48,7 +49,7 @@ export function PlayerControls({ player, caption }: PlayerControlsProps) {
           disabled={index === 0}
           onClick={player.prev}
         >
-          ◀
+          <Icon name="prev" size={16} />
         </button>
         <button
           className="btn btn-primary btn-icon btn-play"
@@ -56,7 +57,7 @@ export function PlayerControls({ player, caption }: PlayerControlsProps) {
           aria-label={playing ? 'Pausar' : 'Tocar'}
           onClick={player.toggle}
         >
-          {playing ? '⏸' : '▶'}
+          <Icon name={playing ? 'pause' : 'play'} size={20} />
         </button>
         <button
           className="btn btn-icon"
@@ -65,7 +66,7 @@ export function PlayerControls({ player, caption }: PlayerControlsProps) {
           disabled={index >= total - 1}
           onClick={player.next}
         >
-          ▶
+          <Icon name="next" size={16} />
         </button>
         <button
           className="btn btn-icon"
@@ -73,7 +74,7 @@ export function PlayerControls({ player, caption }: PlayerControlsProps) {
           aria-label="Reiniciar"
           onClick={player.restart}
         >
-          ↺
+          <Icon name="restart" size={17} />
         </button>
       </div>
 

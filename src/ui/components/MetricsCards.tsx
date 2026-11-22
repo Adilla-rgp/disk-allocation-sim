@@ -35,7 +35,7 @@ export function MetricsCards({ metrics: m }: { metrics: Metrics }) {
         label="Ocupação"
         value={fmtPercent(m.occupancyPercent)}
         bar={m.occupancyPercent}
-        detail={`${m.usedBlocks} de ${m.totalBlocks} blocos`}
+        detail={`${m.usedBlocks} de ${m.totalBlocks} blocos em uso`}
       />
       <MetricCard
         label="Eficiência"
@@ -71,7 +71,7 @@ export function MetricsCards({ metrics: m }: { metrics: Metrics }) {
             <small>aleat.</small>
           </>
         }
-        detail="leituras médias por bloco de dados"
+        detail="leituras, em média, para chegar a um bloco"
       />
     </div>
   );
