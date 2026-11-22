@@ -146,6 +146,27 @@ export function applyOperation(
 }
 
 /**
+ * Atualiza o conjunto de arquivos solicitados pelo roteiro após uma operação.
+ *
+ * Um `create` conta como pedido mesmo se a alocação falhar por falta de espaço, para que
+ * as métricas mostrem quantos bytes a técnica deixou de armazenar. Pedidos inválidos
+ * (tamanho inválido ou nome duplicado) não contam. Um `remove` retira o pedido.
+ */
+function trackRequest(
+  requested: Map<string, number>,
+  operation: Operation,
+  result: AllocationResult | RemoveResult,
+): void {
+  if (operation.type === 'remove') {
+    requested.delete(operation.fileName);
+    return;
+  }
+  const rejected =
+    !result.success && (result.reason === 'invalid-size' || result.reason === 'duplicate-name');
+  if (!rejected) requested.set(operation.fileName, operation.sizeInBytes);
+}
+
+/**
  * Executa um roteiro completo com a técnica informada, a partir de um disco vazio,
  * gerando snapshots antes/depois de cada operação, o log de eventos e as métricas.
  *
@@ -159,6 +180,9 @@ export function runScenario(scenario: Scenario, allocator: Allocator): Simulatio
   const steps: SimulationStep[] = [];
   const events: SimulationEvent[] = [];
   let failures = 0;
+  /** Arquivos que o roteiro pede que existam agora (nome -> bytes), mesmo os que falharam. */
+  const requested = new Map<string, number>();
+  const requestedBytes = () => [...requested.values()].reduce((sum, b) => sum + b, 0);
 
   scenario.operations.forEach((operation, i) => {
     const step = i + 1;
@@ -166,6 +190,7 @@ export function runScenario(scenario: Scenario, allocator: Allocator): Simulatio
     const outcome = applyOperation(disk, dir, allocator, operation, step);
     const after = takeSnapshot(disk, dir, step, 'after');
     failures += outcome.events.filter((e) => e.type === 'fail').length;
+    trackRequest(requested, operation, outcome.result);
     events.push(...outcome.events);
     steps.push({
       step,
@@ -173,7 +198,7 @@ export function runScenario(scenario: Scenario, allocator: Allocator): Simulatio
       before,
       after,
       ...outcome,
-      metrics: computeMetrics(after, allocator, failures),
+      metrics: computeMetrics(after, allocator, failures, requestedBytes()),
     });
   });
 
@@ -185,7 +210,7 @@ export function runScenario(scenario: Scenario, allocator: Allocator): Simulatio
     steps,
     events,
     finalSnapshot,
-    finalMetrics: computeMetrics(finalSnapshot, allocator, failures),
+    finalMetrics: computeMetrics(finalSnapshot, allocator, failures, requestedBytes()),
   };
 }
 
