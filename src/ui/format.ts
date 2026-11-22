@@ -41,3 +41,10 @@ export function fileColors(operations: Operation[]): FileColors {
   }
   return colors;
 }
+
+/** Descreve uma operação do roteiro em português (ex.: `criar A (2.400 B)`). */
+export function describeOperation(op: Operation): string {
+  return op.type === 'create'
+    ? `criar ${op.fileName} (${fmtBytes(op.sizeInBytes)})`
+    : `remover ${op.fileName}`;
+}

@@ -79,15 +79,25 @@ export function allocatorOptions(config: SimConfig): AllocatorOptions {
   };
 }
 
-/** Monta o `Scenario` do core a partir do formulário. */
-export function buildScenario(setup: SimSetup): Scenario {
-  const preset = scenarios.find((s) => s.id === setup.scenarioId);
+/**
+ * Monta o `Scenario` do core a partir do formulário.
+ *
+ * @param config Parâmetros do disco.
+ * @param operations Roteiro de operações.
+ * @param scenarioId Cenário pronto de origem (só define nome e descrição).
+ */
+export function buildScenario(
+  config: SimConfig,
+  operations: Operation[],
+  scenarioId: SimSetup['scenarioId'] = 'custom',
+): Scenario {
+  const preset = scenarios.find((s) => s.id === scenarioId);
   return {
     name: preset?.name ?? 'Personalizado',
     description: preset?.description ?? 'Roteiro editado na interface.',
-    diskSize: setup.config.diskSize,
-    blockSize: setup.config.blockSize,
-    operations: setup.operations,
+    diskSize: config.diskSize,
+    blockSize: config.blockSize,
+    operations,
   };
 }
 
