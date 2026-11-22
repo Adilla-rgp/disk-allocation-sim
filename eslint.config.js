@@ -11,10 +11,6 @@ export default tseslint.config(
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
     languageOptions: { ecmaVersion: 2022 },
-    rules: {
-      // Os stubs ainda não usam seus parâmetros; remover `args: 'none'` quando o core for implementado.
-      '@typescript-eslint/no-unused-vars': ['error', { args: 'none' }],
-    },
   },
   {
     files: ['src/ui/**/*.{ts,tsx}', 'src/App.tsx', 'src/main.tsx'],
