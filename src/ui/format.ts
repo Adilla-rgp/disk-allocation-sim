@@ -1,5 +1,5 @@
 /** Formatação de números e cores de arquivo usadas pelos componentes. */
-import type { Operation } from '../core';
+import type { Operation, SimulationEventType } from '../core';
 
 /** Número com até 2 casas decimais, no padrão brasileiro. */
 export function fmt(v: number, digits = 2): string {
@@ -15,6 +15,14 @@ export function fmtPercent(v: number): string {
 export function fmtBytes(v: number): string {
   return `${fmt(v, 0)} B`;
 }
+
+/** Rótulo do chip de cada tipo de evento do log. */
+export const EVENT_LABELS: Record<SimulationEventType, string> = {
+  allocate: 'alocado',
+  remove: 'removido',
+  fail: 'falha',
+  error: 'erro',
+};
 
 /** Mapa nome do arquivo -> cor (CSS). */
 export type FileColors = Map<string, string>;

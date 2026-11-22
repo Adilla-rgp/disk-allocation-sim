@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import type { SimulationEvent, SimulationEventType } from '../../core';
+import type { SimulationEvent } from '../../core';
+import { EVENT_LABELS } from '../format';
 
 interface EventLogProps {
   events: SimulationEvent[];
@@ -8,14 +9,6 @@ interface EventLogProps {
   /** Clique em um evento: pula para o passo dele. */
   onSelect: (step: number) => void;
 }
-
-/** Rótulo do chip de cada tipo de evento. */
-const CHIP_LABELS: Record<SimulationEventType, string> = {
-  allocate: 'alocado',
-  remove: 'removido',
-  fail: 'falha',
-  error: 'erro',
-};
 
 /**
  * Linha do tempo de eventos, no estilo da timeline do SOPlay: um chip colorido por tipo
@@ -46,7 +39,7 @@ export function EventLog({ events, currentStep, onSelect }: EventLogProps) {
             <button onClick={() => onSelect(e.step)} title={`Ir para o passo ${e.step}`}>
               <span className="tl-step">{e.step}</span>
               <span className="tl-body">
-                <span className={`chip chip-${e.type}`}>{CHIP_LABELS[e.type]}</span>
+                <span className={`chip chip-${e.type}`}>{EVENT_LABELS[e.type]}</span>
                 <span className="tl-msg">{e.message}</span>
               </span>
             </button>
