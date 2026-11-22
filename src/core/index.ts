@@ -4,10 +4,10 @@
 export * from './types';
 export * from './disk';
 export * from './directory';
-export type { Allocator } from './allocators/allocator';
-export { ContiguousAllocator, chooseHole, findHoles } from './allocators/contiguous';
-export type { Hole } from './allocators/contiguous';
-export { DEFAULT_POINTER_SIZE, LinkedAllocator } from './allocators/linked';
-export { IndexedAllocator, maxPointersPerIndexBlock } from './allocators/indexed';
+export * from './random';
+export * from './allocators/allocator';
+export * from './allocators/contiguous';
+export * from './allocators/linked';
+export * from './allocators/indexed';
 export * from './metrics';
 export * from './simulator';

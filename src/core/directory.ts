@@ -1,4 +1,4 @@
-import type { Directory, FileEntry } from './types';
+import type { Directory, FileEntry, TechniqueName } from './types';
 
 /**
  * Cria um diretório vazio (mapa nome do arquivo -> metadados da técnica).
@@ -6,7 +6,7 @@ import type { Directory, FileEntry } from './types';
  * @returns Um diretório sem entradas.
  */
 export function createDirectory(): Directory {
-  throw new Error('Não implementado');
+  return { entries: new Map() };
 }
 
 /**
@@ -16,7 +16,7 @@ export function createDirectory(): Directory {
  * @param fileName Nome do arquivo.
  */
 export function hasEntry(dir: Directory, fileName: string): boolean {
-  throw new Error('Não implementado');
+  return dir.entries.has(fileName);
 }
 
 /**
@@ -27,17 +27,47 @@ export function hasEntry(dir: Directory, fileName: string): boolean {
  * @returns A entrada do arquivo, ou `undefined` se ele não existir.
  */
 export function getEntry(dir: Directory, fileName: string): FileEntry | undefined {
-  throw new Error('Não implementado');
+  return dir.entries.get(fileName);
 }
 
 /**
- * Adiciona uma entrada ao diretório. Lança erro se o nome já existir.
+ * Busca a entrada de um arquivo e garante que ela foi criada pela técnica esperada.
+ *
+ * @param dir Diretório consultado.
+ * @param fileName Nome do arquivo.
+ * @param technique Técnica esperada.
+ * @returns A entrada, já com o tipo dos metadados da técnica.
+ * @throws Error se o arquivo não existir ou pertencer a outra técnica.
+ */
+export function requireEntry<T extends TechniqueName>(
+  dir: Directory,
+  fileName: string,
+  technique: T,
+): Extract<FileEntry, { technique: T }> {
+  const entry = dir.entries.get(fileName);
+  if (!entry) {
+    throw new Error(`Arquivo "${fileName}" não existe no diretório.`);
+  }
+  if (entry.technique !== technique) {
+    throw new Error(
+      `Arquivo "${fileName}" foi alocado pela técnica "${entry.technique}", não por "${technique}".`,
+    );
+  }
+  return entry as Extract<FileEntry, { technique: T }>;
+}
+
+/**
+ * Adiciona uma entrada ao diretório.
  *
  * @param dir Diretório a ser alterado.
  * @param entry Entrada com o nome e os metadados da técnica.
+ * @throws Error se o nome já existir.
  */
 export function addEntry(dir: Directory, entry: FileEntry): void {
-  throw new Error('Não implementado');
+  if (dir.entries.has(entry.name)) {
+    throw new Error(`Já existe um arquivo chamado "${entry.name}".`);
+  }
+  dir.entries.set(entry.name, entry);
 }
 
 /**
@@ -48,7 +78,9 @@ export function addEntry(dir: Directory, entry: FileEntry): void {
  * @returns A entrada removida, ou `undefined` se ela não existia.
  */
 export function removeEntry(dir: Directory, fileName: string): FileEntry | undefined {
-  throw new Error('Não implementado');
+  const entry = dir.entries.get(fileName);
+  dir.entries.delete(fileName);
+  return entry;
 }
 
 /**
@@ -58,7 +90,7 @@ export function removeEntry(dir: Directory, fileName: string): FileEntry | undef
  * @returns Cópia das entradas (alterá-las não afeta o diretório).
  */
 export function listEntries(dir: Directory): FileEntry[] {
-  throw new Error('Não implementado');
+  return [...dir.entries.values()].map((e) => ({ ...e }));
 }
 
 /**
@@ -67,5 +99,16 @@ export function listEntries(dir: Directory): FileEntry[] {
  * @param dir Diretório a ser copiado.
  */
 export function cloneDirectory(dir: Directory): Directory {
-  throw new Error('Não implementado');
+  return { entries: new Map(listEntries(dir).map((e) => [e.name, e])) };
+}
+
+/**
+ * Reconstrói um diretório a partir de uma lista de entradas (por exemplo, de um snapshot).
+ *
+ * @param entries Entradas, na ordem de criação.
+ */
+export function directoryFromEntries(entries: FileEntry[]): Directory {
+  const dir = createDirectory();
+  for (const e of entries) addEntry(dir, { ...e });
+  return dir;
 }
