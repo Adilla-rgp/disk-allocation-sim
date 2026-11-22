@@ -1,7 +1,7 @@
-import type { Scenario } from '../core';
+import type { ScenarioPreset } from './types';
 
 /**
- * Roteiro de exemplo (disco de 32 blocos de 512 bytes).
+ * Cenário "Fragmentação" (disco de 32 blocos de 512 bytes).
  *
  * Cria arquivos de tamanhos variados (não múltiplos do bloco, para gerar fragmentação
  * interna) e remove B e D, abrindo buracos de 3 e 4 blocos. O arquivo F (4000 bytes =
@@ -11,9 +11,12 @@ import type { Scenario } from '../core';
  * Blocos ocupados por técnica (contígua / encadeada / indexada, com ponteiro de 4 bytes):
  * A 5/5/6, B 3/3/4, C 6/6/7, D 4/4/5, E 7/7/8, F 8/8/9, G 1/1/2, H 4/4/5.
  */
-export const defaultScenario: Scenario = {
-  name: 'Padrão',
-  description: 'Cria e remove arquivos de tamanhos variados para provocar fragmentação externa.',
+export const fragmentationScenario: ScenarioPreset = {
+  id: 'fragmentation',
+  name: 'Fragmentação',
+  description:
+    'Cria e remove arquivos de tamanhos variados até a contígua falhar por fragmentação ' +
+    'externa, enquanto encadeada e indexada ainda conseguem alocar.',
   diskSize: 32,
   blockSize: 512,
   operations: [

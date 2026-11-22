@@ -4,7 +4,8 @@
  *
  * Uso:
  *   npm run cli -- [contiguous|linked|indexed] [first-fit|best-fit|worst-fit]
- *                  [--policy first-free|random] [--seed N] [--compare]
+ *                  [--scenario fair|fragmentation] [--policy first-free|random]
+ *                  [--seed N] [--compare]
  */
 import { parseArgs } from 'node:util';
 import {
@@ -22,7 +23,7 @@ import {
   type SimulationResult,
   type TechniqueName,
 } from '../src/core';
-import { defaultScenario } from '../src/scenarios/default';
+import { findScenario, scenarios, type ScenarioPreset } from '../src/scenarios';
 
 const STRATEGIES: FitStrategy[] = ['first-fit', 'best-fit', 'worst-fit'];
 const POLICIES: FreeBlockPolicy[] = ['first-free', 'random'];
@@ -36,6 +37,11 @@ const METRIC_ROWS: [keyof Metrics, string, (v: number) => string][] = [
   ['overheadBlocks', 'Blocos de overhead (índices)', String],
   ['pointerOverheadBytes', 'Bytes de overhead (ponteiros)', (v) => `${v} B`],
   ['internalFragmentationBytes', 'Fragmentação interna', (v) => `${v} B`],
+  ['requestedBytes', 'Bytes solicitados', (v) => `${v} B`],
+  ['storedBytes', 'Bytes úteis armazenados', (v) => `${v} B`],
+  ['allocatedBytes', 'Bytes alocados', (v) => `${v} B`],
+  ['efficiencyPercent', 'Eficiência (úteis/alocados)', (v) => `${fmt(v)}%`],
+  ['overheadBytes', 'Overhead total (bytes)', (v) => `${v} B`],
   ['holeCount', 'Buracos livres', String],
   ['largestHole', 'Maior buraco (blocos)', String],
   ['failures', 'Falhas de alocação', String],
@@ -175,14 +181,28 @@ function printComparison(results: SimulationResult[]): void {
       }`,
   );
   console.log(`\nArquivos que falharam — ${failed.join(' · ')}`);
+  for (const r of results) {
+    const { failures, storedBytes, requestedBytes } = r.finalMetrics;
+    if (failures > 0) {
+      console.log(
+        `Nota: ${r.label} armazenou ${storedBytes} B de ${requestedBytes} B solicitados.`,
+      );
+    }
+  }
 }
 
 /** Lê e valida os argumentos da linha de comando. */
-function readArgs(): { technique: TechniqueName; options: AllocatorOptions; compare: boolean } {
+function readArgs(): {
+  technique: TechniqueName;
+  options: AllocatorOptions;
+  compare: boolean;
+  scenario: ScenarioPreset;
+} {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
     options: {
       compare: { type: 'boolean', default: false },
+      scenario: { type: 'string', default: 'fragmentation' },
       policy: { type: 'string', default: 'first-free' },
       seed: { type: 'string' },
     },
@@ -197,6 +217,12 @@ function readArgs(): { technique: TechniqueName; options: AllocatorOptions; comp
   if (!POLICIES.includes(values.policy as FreeBlockPolicy)) {
     throw new Error(`Política inválida: "${values.policy}". Use ${POLICIES.join(', ')}.`);
   }
+  const scenario = findScenario(values.scenario);
+  if (!scenario) {
+    throw new Error(
+      `Cenário inválido: "${values.scenario}". Use ${scenarios.map((s) => s.id).join(', ')}.`,
+    );
+  }
   const seed = values.seed === undefined ? undefined : Number(values.seed);
   if (seed !== undefined && !Number.isInteger(seed)) {
     throw new Error(`Semente inválida: "${values.seed}". Use um inteiro.`);
@@ -209,14 +235,15 @@ function readArgs(): { technique: TechniqueName; options: AllocatorOptions; comp
       seed,
     },
     compare: values.compare,
+    scenario,
   };
 }
 
 function main(): void {
   try {
-    const { technique, options, compare } = readArgs();
-    printSimulation(runScenario(defaultScenario, createAllocator(technique, options)));
-    if (compare) printComparison(runComparison(defaultScenario, options));
+    const { technique, options, compare, scenario } = readArgs();
+    printSimulation(runScenario(scenario, createAllocator(technique, options)));
+    if (compare) printComparison(runComparison(scenario, options));
   } catch (err) {
     console.error(`Erro: ${(err as Error).message}`);
     process.exitCode = 1;

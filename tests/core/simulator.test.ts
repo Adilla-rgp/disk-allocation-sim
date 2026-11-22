@@ -12,7 +12,7 @@ import {
   TECHNIQUES,
   type Scenario,
 } from '../../src/core';
-import { defaultScenario } from '../../src/scenarios/default';
+import { fragmentationScenario } from '../../src/scenarios';
 
 const small: Scenario = {
   name: 'pequeno',
@@ -97,9 +97,9 @@ describe('Simulador', () => {
     });
   });
 
-  describe('cenário padrão', () => {
+  describe('cenário fragmentação', () => {
     it('só a contígua falha em F, por fragmentação externa', () => {
-      const results = runComparison(defaultScenario);
+      const results = runComparison(fragmentationScenario);
       expect(results.map((r) => r.technique)).toEqual(TECHNIQUES);
       for (const r of results) {
         const failures = r.events.filter((e) => e.type === 'fail');
@@ -119,8 +119,8 @@ describe('Simulador', () => {
 
     it.each(TECHNIQUES)('com a política random, %s é determinística', (technique) => {
       const options = { freeBlockPolicy: 'random' as const, seed: 2026 };
-      const a = runScenario(defaultScenario, createAllocator(technique, options));
-      const b = runScenario(defaultScenario, createAllocator(technique, options));
+      const a = runScenario(fragmentationScenario, createAllocator(technique, options));
+      const b = runScenario(fragmentationScenario, createAllocator(technique, options));
       expect(a.finalSnapshot).toEqual(b.finalSnapshot);
       expect(a.events).toEqual(b.events);
     });

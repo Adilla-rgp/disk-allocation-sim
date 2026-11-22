@@ -19,6 +19,23 @@ export interface Metrics {
   pointerOverheadBytes: number;
   /** Bytes desperdiçados no último bloco de cada arquivo (fragmentação interna). */
   internalFragmentationBytes: number;
+  /**
+   * Bytes que o roteiro pede que estejam no disco neste ponto: soma dos tamanhos dos
+   * arquivos criados (mesmo os que falharam) e ainda não removidos. Sem falhas, é igual a
+   * {@link Metrics.storedBytes}.
+   */
+  requestedBytes: number;
+  /** Bytes úteis armazenados: soma dos tamanhos lógicos dos arquivos do diretório. */
+  storedBytes: number;
+  /** Bytes alocados: blocos usados × tamanho do bloco. */
+  allocatedBytes: number;
+  /**
+   * Eficiência de armazenamento, em porcentagem (0 a 100): bytes úteis / bytes alocados.
+   * Vale 0 quando nada está alocado.
+   */
+  efficiencyPercent: number;
+  /** Overhead total em bytes: ponteiros + blocos de índice × tamanho do bloco. */
+  overheadBytes: number;
   /** Quantidade de buracos (sequências máximas de blocos livres). */
   holeCount: number;
   /** Tamanho do maior buraco, em blocos (0 se o disco estiver cheio). */
@@ -52,9 +69,16 @@ export function countFailures(events: SimulationEvent[]): number {
  * @param snapshot Estado do disco e do diretório.
  * @param allocator Técnica que produziu o snapshot (define ponteiros e custo de acesso).
  * @param failures Total de falhas de alocação até o snapshot (ver {@link countFailures}).
+ * @param requestedBytes Bytes solicitados até o snapshot (padrão: os bytes armazenados, ou
+ *   seja, supõe que nenhum pedido falhou).
  * @returns As métricas do snapshot.
  */
-export function computeMetrics(snapshot: Snapshot, allocator: Allocator, failures = 0): Metrics {
+export function computeMetrics(
+  snapshot: Snapshot,
+  allocator: Allocator,
+  failures = 0,
+  requestedBytes?: number,
+): Metrics {
   const disk: Disk = { blockSize: snapshot.blockSize, blocks: snapshot.blocks };
   const dir = directoryFromEntries(snapshot.directory);
 
@@ -66,12 +90,14 @@ export function computeMetrics(snapshot: Snapshot, allocator: Allocator, failure
   const pointerBytesPerBlock = disk.blockSize - dataBytesPerBlock;
 
   let dataBlocks = 0;
+  let storedBytes = 0;
   let pointerOverheadBytes = 0;
   let internalFragmentationBytes = 0;
   let sequentialReads = 0;
   let randomReads = 0;
   for (const entry of snapshot.directory) {
     dataBlocks += entry.length;
+    storedBytes += entry.sizeInBytes;
     pointerOverheadBytes += entry.length * pointerBytesPerBlock;
     internalFragmentationBytes += entry.length * dataBytesPerBlock - entry.sizeInBytes;
     sequentialReads += allocator.blocksOf(disk, dir, entry.name).length;
@@ -80,14 +106,22 @@ export function computeMetrics(snapshot: Snapshot, allocator: Allocator, failure
     }
   }
 
+  const overheadBlocks = disk.blocks.filter((b) => b.isIndexBlock).length;
+  const allocatedBytes = usedBlocks * disk.blockSize;
+
   return {
     totalBlocks,
     usedBlocks,
     freeBlocks: totalBlocks - usedBlocks,
     occupancyPercent: (usedBlocks / totalBlocks) * 100,
-    overheadBlocks: disk.blocks.filter((b) => b.isIndexBlock).length,
+    overheadBlocks,
     pointerOverheadBytes,
     internalFragmentationBytes,
+    requestedBytes: requestedBytes ?? storedBytes,
+    storedBytes,
+    allocatedBytes,
+    efficiencyPercent: allocatedBytes ? (storedBytes / allocatedBytes) * 100 : 0,
+    overheadBytes: pointerOverheadBytes + overheadBlocks * disk.blockSize,
     holeCount: holes.length,
     largestHole: holes.reduce((max, h) => Math.max(max, h.length), 0),
     failures,
