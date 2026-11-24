@@ -4,7 +4,7 @@
  */
 export const CREDITS = {
   /** Nomes de quem fez o trabalho, na ordem em que devem aparecer. */
-  team: [] as string[],
+  team: ['Ádilla Roberta', 'Brendda Thamyres', 'Diego Miqueias', 'Sarah Marques'] as string[],
   course: 'Sistemas Operacionais I',
   institution: 'UFMA',
 };
