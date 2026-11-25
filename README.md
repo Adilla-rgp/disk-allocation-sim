@@ -2,6 +2,8 @@
 
 Trabalho final de **Sistemas Operacionais I — UFMA**.
 
+![Execução passo a passo da alocação contígua no cenário Fragmentação](docs/relatorio/prints/pc-2-executar.png)
+
 ## Objetivo
 
 Simular, de forma visual e interativa, as três técnicas clássicas de alocação de arquivos
@@ -76,7 +78,8 @@ Calculadas por `computeMetrics` (`src/core/metrics.ts`) a cada passo:
 ## Interface
 
 `npm run dev` abre a interface (tema escuro, inspirada no SOPlay). Ela foi pensada para
-caber numa tela de 1366×768 e tem três páginas:
+caber numa tela de 1366×768, se adapta a tablets e celulares (ver [Prints](#prints)) e
+tem três páginas:
 
 - **Configuração**: no Painel de Controle ficam a técnica (contígua com a estratégia,
   encadeada ou indexada), a política de blocos livres, a semente (quando a política é
@@ -102,6 +105,28 @@ Em todas as páginas que mostram passos há um **narrador**: uma caixa que expli
 português simples o que aconteceu e por quê. Ele está em `src/ui/narration.ts` e usa
 apenas os eventos e snapshots do core.
 
+### Prints
+
+Todos no cenário **Fragmentação**. Os arquivos ficam em `docs/relatorio/prints/`.
+
+**Computador (1440px)**
+
+| 1 · Montar                                                           | 2 · Executar                                                       | 3 · Comparar                                                         |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| ![Configuração no computador](docs/relatorio/prints/pc-1-montar.png) | ![Execução no computador](docs/relatorio/prints/pc-2-executar.png) | ![Comparação no computador](docs/relatorio/prints/pc-3-comparar.png) |
+
+**Tablet (820px)**
+
+| 1 · Montar                                                                                     | 2 · Executar                                                                                 | 3 · Comparar                                                                                   |
+| ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| <img src="docs/relatorio/prints/tablet-1-montar.png" alt="Configuração no tablet" width="260"> | <img src="docs/relatorio/prints/tablet-2-executar.png" alt="Execução no tablet" width="260"> | <img src="docs/relatorio/prints/tablet-3-comparar.png" alt="Comparação no tablet" width="260"> |
+
+**Celular (390px)**
+
+| 1 · Montar                                                                                       | 2 · Executar                                                                                   | 3 · Comparar                                                                                     |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| <img src="docs/relatorio/prints/celular-1-montar.png" alt="Configuração no celular" width="220"> | <img src="docs/relatorio/prints/celular-2-executar.png" alt="Execução no celular" width="220"> | <img src="docs/relatorio/prints/celular-3-comparar.png" alt="Comparação no celular" width="220"> |
+
 ### Identidade visual
 
 O nome na interface é **Blocos & Arquivos**. As fontes são Bricolage Grotesque nos
@@ -117,6 +142,29 @@ A UI não reimplementa regras de alocação. O hook `useSimulation(config, ops)`
 `useComparison` faz o mesmo com `runComparison`.
 
 Outros scripts: `npm run build`, `npm run lint`, `npm run format`.
+
+## Testes
+
+Os testes ficam em `tests/core/` (Vitest) e cobrem só o core: `npm test` roda os 95.
+
+![Saída do npm test com os 95 testes passando](docs/relatorio/prints/testes/teste-0-todos.png)
+
+<details>
+<summary>Prints de cada arquivo de teste</summary>
+
+| Arquivo              | O que testa                                           | Print                                                                     |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------- |
+| `contiguous.test.ts` | alocação contígua, estratégias e fragmentação externa | [teste-contiguous.png](docs/relatorio/prints/testes/teste-contiguous.png) |
+| `linked.test.ts`     | alocação encadeada e overhead de ponteiro             | [teste-linked.png](docs/relatorio/prints/testes/teste-linked.png)         |
+| `indexed.test.ts`    | alocação indexada e bloco de índice                   | [teste-indexed.png](docs/relatorio/prints/testes/teste-indexed.png)       |
+| `simulator.test.ts`  | snapshots, eventos e cenário de fragmentação          | [teste-simulator.png](docs/relatorio/prints/testes/teste-simulator.png)   |
+| `efficiency.test.ts` | bytes, eficiência e cenários prontos                  | [teste-efficiency.png](docs/relatorio/prints/testes/teste-efficiency.png) |
+| `disk.test.ts`       | disco                                                 | [teste-disk.png](docs/relatorio/prints/testes/teste-disk.png)             |
+| `metrics.test.ts`    | métricas                                              | [teste-metrics.png](docs/relatorio/prints/testes/teste-metrics.png)       |
+| `random.test.ts`     | sorteio com semente e política de blocos livres       | [teste-random.png](docs/relatorio/prints/testes/teste-random.png)         |
+| `directory.test.ts`  | diretório                                             | [teste-directory.png](docs/relatorio/prints/testes/teste-directory.png)   |
+
+</details>
 
 ## Arquitetura
 
@@ -163,7 +211,8 @@ tests/
   core/                 # um arquivo de teste por módulo + eficiência e cenários
 docs/
   relatorio/
-    prints/             # capturas de tela para o relatório
+    prints/             # capturas da interface (pc, tablet, celular)
+      testes/           # saída do Vitest para cada arquivo de teste
 ```
 
 ## Divisão da equipe
