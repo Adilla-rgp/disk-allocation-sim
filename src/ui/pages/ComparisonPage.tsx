@@ -53,7 +53,7 @@ export function ComparisonPage({ setup }: { setup: SimSetup }) {
 
       <div className="comparison-toolbar">
         <span className="hint">
-          Passe o mouse sobre um arquivo para destacá-lo nas três grades.
+          Passe o mouse (ou toque) sobre um arquivo para destacá-lo nas três grades.
         </span>
         <MomentToggle player={player} />
       </div>
@@ -161,33 +161,35 @@ function ComparisonTable({ results, fileName }: { results: SimulationResult[]; f
           <Icon name="download" size={16} /> Exportar CSV
         </button>
       </div>
-      <table className="data-table comparison-table">
-        <thead>
-          <tr>
-            <th>Métrica</th>
-            {results.map((r) => (
-              <th key={r.technique} className="num">
-                {r.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {METRIC_ROWS.map((row) => {
-            const best = bestColumns(row, results);
-            return (
-              <tr key={row.key}>
-                <td>{row.label}</td>
-                {results.map((r, i) => (
-                  <td key={r.technique} className={`num ${best.has(i) ? 'best' : ''}`}>
-                    {row.format(r.finalMetrics[row.key])}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <div className="table-scroll">
+        <table className="data-table comparison-table">
+          <thead>
+            <tr>
+              <th>Métrica</th>
+              {results.map((r) => (
+                <th key={r.technique} className="num">
+                  {r.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {METRIC_ROWS.map((row) => {
+              const best = bestColumns(row, results);
+              return (
+                <tr key={row.key}>
+                  <td>{row.label}</td>
+                  {results.map((r, i) => (
+                    <td key={r.technique} className={`num ${best.has(i) ? 'best' : ''}`}>
+                      {row.format(r.finalMetrics[row.key])}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       {notes.length > 0 ? (
         <ul className="notes">
           {notes.map((n) => (

@@ -1287,6 +1287,10 @@ input[type='number'].input {
   padding: 4px 10px;
 }
 
+.comparison-table td.num {
+  white-space: nowrap;
+}
+
 .comparison-table td.best {
   color: var(--ok);
   font-weight: 700;
@@ -1305,4 +1309,288 @@ input[type='number'].input {
   border: 1px solid rgba(255, 143, 143, 0.3);
   color: #ffd0d0;
   font-size: 13.5px;
+}
+
+.ops-table .op-type {
+  width: 130px;
+}
+
+.ops-table .op-size {
+  width: 170px;
+}
+
+.ops-table .op-del {
+  width: 44px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+
+/* ---------- Responsivo ---------- */
+
+/* Notebooks e tablets na horizontal: o log desce para baixo do disco. */
+@media (max-width: 1180px) {
+  .execution-main {
+    grid-template-columns: 280px minmax(0, 1fr);
+    height: auto;
+  }
+
+  .execution-main > .card {
+    max-height: 560px;
+  }
+
+  .execution-main > .log-card {
+    grid-column: 1 / -1;
+    max-height: 320px;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .config-page {
+    grid-template-columns: 360px 1fr;
+  }
+}
+
+/* Tablets na vertical e celulares: tudo em uma coluna. */
+@media (max-width: 900px) {
+  .config-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .config-page,
+  .execution-main,
+  .comparison-grids {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .execution-main > .card {
+    max-height: 380px;
+  }
+
+  /* O disco é o protagonista: vem primeiro e nunca é cortado. */
+  .execution-main > .disk-card {
+    order: -1;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .technique-col .narration {
+    min-height: 0;
+  }
+
+  .player {
+    flex-wrap: wrap;
+    gap: 10px 14px;
+  }
+
+  .player-status {
+    flex-basis: 220px;
+  }
+
+  .player-progress {
+    order: 5;
+    flex-basis: 100%;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  html,
+  body {
+    font-size: 14px;
+  }
+
+  .app {
+    padding: 12px 12px 16px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .brand small {
+    font-size: 12px;
+  }
+
+  .tabs {
+    margin-left: 0;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 8px 6px;
+    white-space: nowrap;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions .btn {
+    padding: 11px 14px;
+  }
+
+  .control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .technique-picker {
+    gap: 6px;
+  }
+
+  .technique-option {
+    padding: 8px;
+  }
+
+  .technique-option .mini-disk {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .scenario-picker {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ops-scroll {
+    max-height: none;
+    overflow-x: auto;
+  }
+
+  .ops-table td,
+  .ops-table th {
+    padding: 0 3px;
+  }
+
+  .ops-table .op-index {
+    width: 22px;
+  }
+
+  .ops-table .op-type {
+    width: 92px;
+  }
+
+  .ops-table .op-size {
+    width: 84px;
+  }
+
+  .op-file .input {
+    min-width: 56px;
+  }
+
+  .ops-table .op-del {
+    width: 36px;
+  }
+
+  .ops-footer .btn {
+    flex: 1;
+  }
+
+  /* Player em duas linhas: botões + velocidade, depois o passo e a barra. */
+  .player {
+    padding: 10px 12px;
+  }
+
+  .player-buttons {
+    gap: 4px;
+  }
+
+  .player-status {
+    order: 4;
+    flex-basis: 100%;
+  }
+
+  .player-caption {
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    white-space: normal;
+  }
+
+  .player-speed {
+    margin-left: auto;
+  }
+
+  .player-speed > .hint {
+    display: none;
+  }
+
+  .disk-header,
+  .comparison-toolbar,
+  .table-head {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .moment-toggle {
+    width: 100%;
+  }
+
+  .comparison-toolbar .moment-toggle {
+    order: -1;
+  }
+
+  .disk-grid {
+    --cell: 34px;
+    --gap: 5px;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .comparison-table {
+    font-size: 12.5px;
+  }
+
+  .comparison-table td,
+  .comparison-table th {
+    padding: 4px 5px;
+  }
+
+  .comparison-table td:first-child {
+    min-width: 96px;
+  }
+
+  .metric-value {
+    font-size: 20px;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .footer-tip {
+    display: none;
+  }
+}
+
+/* Telas bem estreitas (≤ 380px): botões do player um pouco menores. */
+@media (max-width: 380px) {
+  .btn-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .btn-play {
+    width: 40px;
+  }
+
+  .technique-option small {
+    display: none;
+  }
 }
