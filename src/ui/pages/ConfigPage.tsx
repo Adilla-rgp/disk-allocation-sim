@@ -282,7 +282,7 @@ function OperationsPanel({
             {operations.map((op, i) => (
               <tr key={i}>
                 <td className="op-index">{i + 1}</td>
-                <td style={{ width: 130 }}>
+                <td className="op-type">
                   <select
                     className="input"
                     value={op.type}
@@ -303,7 +303,7 @@ function OperationsPanel({
                     />
                   </div>
                 </td>
-                <td style={{ width: 170 }}>
+                <td className="op-size">
                   {op.type === 'create' ? (
                     <input
                       className="input"
@@ -321,7 +321,7 @@ function OperationsPanel({
                     <span className="hint">—</span>
                   )}
                 </td>
-                <td style={{ width: 44 }}>
+                <td className="op-del">
                   <button
                     className="btn btn-ghost btn-icon"
                     title="Remover linha"

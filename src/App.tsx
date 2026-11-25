@@ -67,7 +67,7 @@ export default function App() {
           Trabalho final de {CREDITS.course} · {CREDITS.institution}
           {CREDITS.team.length > 0 && <> · feito por {joinNames(CREDITS.team)}</>}
         </span>
-        <span>Dica: use ← → e espaço para navegar pelos passos.</span>
+        <span className="footer-tip">Dica: use ← → e espaço para navegar pelos passos.</span>
       </footer>
     </div>
   );
